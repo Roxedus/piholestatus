@@ -1,4 +1,40 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_PIHOLE",
+      "label": "PiHole",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "5.2.4"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": "5.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": "5.0.0"
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -15,7 +51,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 4,
+  "id": null,
   "links": [],
   "panels": [
     {
@@ -36,7 +72,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "PiHole",
+      "datasource": "${DS_PIHOLE}",
       "fill": 1,
       "gridPos": {
         "h": 6,
@@ -163,7 +199,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Querries",
+      "title": "Queries",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -207,7 +243,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "PiHole",
+      "datasource": "${DS_PIHOLE}",
       "fill": 1,
       "gridPos": {
         "h": 6,
@@ -239,7 +275,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "Unique clients",
+          "alias": "Unique Clients",
           "groupBy": [
             {
               "params": [
@@ -276,7 +312,7 @@
           "tags": []
         },
         {
-          "alias": "Clients Ever Seen",
+          "alias": "Clients Total",
           "groupBy": [
             {
               "params": [
@@ -362,8 +398,8 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
-      "format": "none",
+      "datasource": "${DS_PIHOLE}",
+      "format": "locale",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -414,7 +450,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "alias": "Querries today",
+          "alias": "Queries Today",
           "dsType": "influxdb",
           "groupBy": [
             {
@@ -453,7 +489,7 @@
         }
       ],
       "thresholds": "500,2000",
-      "title": "Querries today",
+      "title": "Queries Today",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -474,9 +510,9 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
+      "datasource": "${DS_PIHOLE}",
       "decimals": null,
-      "format": "none",
+      "format": "percent",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -566,7 +602,7 @@
         }
       ],
       "thresholds": "20,40,50",
-      "title": "Today blocked ads in percentage",
+      "title": "Ads Blocked Today (Percentage)",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -587,8 +623,8 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
-      "format": "none",
+      "datasource": "${DS_PIHOLE}",
+      "format": "locale",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -639,7 +675,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "alias": "Uinique Domains",
+          "alias": "Unique Domains",
           "dsType": "influxdb",
           "groupBy": [
             {
@@ -678,7 +714,7 @@
         }
       ],
       "thresholds": "1000,1500",
-      "title": "Uinique Domains",
+      "title": "Unique Domains",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -699,8 +735,8 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
-      "format": "none",
+      "datasource": "${DS_PIHOLE}",
+      "format": "locale",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -811,8 +847,8 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
-      "format": "none",
+      "datasource": "${DS_PIHOLE}",
+      "format": "locale",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -863,7 +899,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "alias": "Ads blocked today",
+          "alias": "Ads Blocked Today",
           "dsType": "influxdb",
           "groupBy": [
             {
@@ -902,7 +938,7 @@
         }
       ],
       "thresholds": "50,200",
-      "title": "Ads blocked today",
+      "title": "Ads Blocked Today",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -923,7 +959,7 @@
         "#bf1b00",
         "#cca300"
       ],
-      "datasource": "PiHole",
+      "datasource": "${DS_PIHOLE}",
       "format": "short",
       "gauge": {
         "maxValue": 100,
@@ -1015,7 +1051,7 @@
             {
               "key": "host",
               "operator": "=",
-              "value": "pihole"
+              "value": "raspberrypi"
             }
           ]
         }
@@ -1047,8 +1083,8 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
-      "format": "none",
+      "datasource": "${DS_PIHOLE}",
+      "format": "locale",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -1099,7 +1135,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "alias": "Cached domains",
+          "alias": "Cached Domains",
           "dsType": "influxdb",
           "groupBy": [
             {
@@ -1138,7 +1174,7 @@
         }
       ],
       "thresholds": "100,1500",
-      "title": "Cached domains",
+      "title": "Cached Domains",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -1159,8 +1195,8 @@
         "rgba(237, 129, 40, 0.89)",
         "#299c46"
       ],
-      "datasource": "PiHole",
-      "format": "none",
+      "datasource": "${DS_PIHOLE}",
+      "format": "locale",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -1211,7 +1247,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "alias": "Forwarded domains",
+          "alias": "Forwarded Domains",
           "dsType": "influxdb",
           "groupBy": [
             {
@@ -1250,7 +1286,7 @@
         }
       ],
       "thresholds": "20,50",
-      "title": "Forwarded domains",
+      "title": "Forwarded Domains",
       "type": "singlestat",
       "valueFontSize": "110%",
       "valueMaps": [
@@ -1296,5 +1332,5 @@
   "timezone": "browser",
   "title": "PiHole",
   "uid": "000000004",
-  "version": 29
+  "version": 3
 }

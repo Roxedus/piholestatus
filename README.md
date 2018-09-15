@@ -7,8 +7,8 @@ To install and run the script as a service under SystemD. See: https://linuxconf
 Confuguration is done in `configuration.py`, rename `configuration.example.py` and add your information.
 
 ```python
->pip install pihole
->pip install influxdb
+>pip3 install PiHole-api
+>pip3 install influxdb
 ```
 
 

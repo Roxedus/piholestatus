@@ -53,9 +53,6 @@ def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains
         }
     ]
 
-    print(json_body_querries)
-    print(json_body_state)
-    print(json_body_stats)
 
     client = InfluxDBClient(configuration.influx_host, configuration.influx_port, configuration.influx_user,
                             configuration.influx_passsword, configuration.influx_database)  # InfluxDB host, InfluxDB port, Username, Password, database
@@ -78,7 +75,7 @@ if __name__ == '__main__':
         queries_cached = api.cached.replace(",", "")
         clients_ever_seen = api.total_clients.replace(",", "")
         unique_clients = api.unique_clients.replace(",", "")
-        status = api.status
+        status = api.status.capitalize()
 
         send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
                  queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status)

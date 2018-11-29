@@ -1,0 +1,2 @@
+PiHole-api
+influxdb

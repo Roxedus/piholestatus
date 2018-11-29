@@ -1,7 +1,16 @@
+import sys
 import configuration
 import pihole as ph
 import time
 from influxdb import InfluxDBClient
+
+try:
+    do_loop = configuration.do_loop
+except:
+    do_loop = False
+
+if "-manual" in sys.argv:
+    do_loop = False
 
 def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
              queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status):
@@ -61,22 +70,30 @@ def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains
     client.write_points(json_body_state)
     client.write_points(json_body_stats)
 
+def run_script():
+    api = ph.PiHole(configuration.pihole_ip)
+    api.refresh()
+    domains_being_blocked = api.domain_count.replace(",", "")
+    dns_queries_today = api.queries.replace(",", "")
+    ads_percentage_today = api.ads_percentage
+    ads_blocked_today = api.blocked.replace(",", "")
+    unique_domains = api.unique_domains.replace(",", "")
+    queries_forwarded = api.forwarded.replace(",", "")
+    queries_cached = api.cached.replace(",", "")
+    clients_ever_seen = api.total_clients.replace(",", "")
+    unique_clients = api.unique_clients.replace(",", "")
+    status = api.status.capitalize()
+
+    meep = send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
+             queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status)
+    return meep
 
 if __name__ == '__main__':
-    while True:
-        api = ph.PiHole(configuration.pihole_ip)
-        api.refresh()
-        domains_being_blocked = api.domain_count.replace(",", "")
-        dns_queries_today = api.queries.replace(",", "")
-        ads_percentage_today = api.ads_percentage
-        ads_blocked_today = api.blocked.replace(",", "")
-        unique_domains = api.unique_domains.replace(",", "")
-        queries_forwarded = api.forwarded.replace(",", "")
-        queries_cached = api.cached.replace(",", "")
-        clients_ever_seen = api.total_clients.replace(",", "")
-        unique_clients = api.unique_clients.replace(",", "")
-        status = api.status.capitalize()
-
-        send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
-                 queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status)
-        time.sleep(configuration.interval)
+    if do_loop is True:
+        print("Loop On")
+        while do_loop is True:
+            run_script()
+            time.sleep(configuration.interval)
+    if do_loop is not True:
+        print("Loop Off")
+        run_script()

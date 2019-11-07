@@ -1,18 +1,33 @@
 import sys
+import os
+from collections import namedtuple
 import configuration
 import pihole as ph
 import time
 from influxdb import InfluxDBClient
 
-try:
-    do_loop = configuration.do_loop
-except:
-    do_loop = False
 
-if "-manual" in sys.argv:
-    do_loop = False
+def get_settings():
+    pi = namedtuple('settings',
+                    'hostname pihole_ip influx_host influx_port influx_user '
+                    'influx_passsword influx_database interval do_loop')
+    hostname = os.getenv('host-name', configuration.hostname)
+    pihole_ip = os.getenv('pihole_ip', configuration.pihole_ip)
+    influx_host = os.getenv('influx_host', configuration.influx_host)
+    influx_port = os.getenv('influx_port', configuration.influx_port)
+    influx_user = os.getenv('influx_user', configuration.influx_user)
+    influx_passsword = os.getenv('influx_passsword', configuration.influx_passsword)
+    influx_database = os.getenv('influx_database', configuration.influx_database)
+    interval = os.getenv('interval', configuration.interval)
+    do_loop = os.getenv('do_loop', configuration.do_loop)
+    if "-manual" in sys.argv:
+        do_loop = False
+    conf = pi(hostname, pihole_ip, influx_host, influx_port, influx_user, influx_passsword, influx_database,
+              interval, do_loop)
+    return conf
 
-def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
+
+def send_msg(settings, client, ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
              queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status):
     if domains_being_blocked == "N/A":
         domains_being_blocked = 0
@@ -23,7 +38,7 @@ def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains
         {
             "measurement": "pihole.querries",
             "tags": {
-                "host": configuration.hostname
+                "host": settings.hostname
             },
             "fields": {
                 "dns_queries_today": int(dns_queries_today),
@@ -38,7 +53,7 @@ def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains
         {
             "measurement": "pihole.state",
             "tags": {
-                "host": configuration.hostname
+                "host": settings.hostname
             },
             "fields": {
                 "domains_being_blocked": int(domains_being_blocked),
@@ -53,7 +68,7 @@ def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains
         {
             "measurement": "pihole.stats",
             "tags": {
-                "host": configuration.hostname
+                "host": settings.hostname
             },
             "fields": {
                 "ads_percentage_today": float(ads_percentage_today),
@@ -63,15 +78,14 @@ def send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains
     ]
 
 
-    client = InfluxDBClient(configuration.influx_host, configuration.influx_port, configuration.influx_user,
-                            configuration.influx_passsword, configuration.influx_database)  # InfluxDB host, InfluxDB port, Username, Password, database
-    # client.create_database(influx_database) # Uncomment to create the database (expected to exist prior to feeding it data)
+    #client.create_database(configuration.influx_database)
     client.write_points(json_body_querries)
     client.write_points(json_body_state)
     client.write_points(json_body_stats)
 
-def run_script():
-    api = ph.PiHole(configuration.pihole_ip)
+
+def run_script(settings, client):
+    api = ph.PiHole(settings.pihole_ip)
     api.refresh()
     domains_being_blocked = api.domain_count.replace(",", "")
     dns_queries_today = api.queries.replace(",", "")
@@ -84,16 +98,19 @@ def run_script():
     unique_clients = api.unique_clients.replace(",", "")
     status = api.status.capitalize()
 
-    meep = send_msg(ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked, unique_domains,
-             queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status)
-    return meep
+    send_msg(settings, client, ads_percentage_today, ads_blocked_today, dns_queries_today, domains_being_blocked,
+             unique_domains, queries_forwarded, queries_cached, clients_ever_seen, unique_clients, status)
+
 
 if __name__ == '__main__':
-    if do_loop is True:
+    settings = get_settings()
+    client = InfluxDBClient(settings.influx_host, settings.influx_port, settings.influx_user,
+                            settings.influx_passsword, settings.influx_database)
+    if settings.do_loop is True:
         print("Loop On")
-        while do_loop is True:
-            run_script()
-            time.sleep(configuration.interval)
-    if do_loop is not True:
+        while settings.do_loop is True:
+            run_script(settings, client)
+            time.sleep(settings.interval)
+    if settings.do_loop is not True:
         print("Loop Off")
-        run_script()
+        run_script(settings, client)

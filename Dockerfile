@@ -14,10 +14,7 @@ ENV host-name=PiHole \
 
 COPY / /app
 
-RUN \
-    python3 -m pip install -r /app/requirements.txt && \
-    chown -R abc:abc \
-    /app
+RUN python3 -m pip install -r /app/requirements.txt
 
 WORKDIR /app
 

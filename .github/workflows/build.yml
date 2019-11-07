@@ -1,0 +1,34 @@
+name: Build Docker-Image for piholestatus
+
+on: 
+  push:
+    #paths:
+    #- '**.py'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    
+    env:
+      TOKEN: ${{ secrets.docker_token }}
+      DOCKER_REPO: roxedus/piholestatus
+
+    
+    steps:
+    - uses: actions/checkout@v1
+      
+    - name: Build the Docker image
+      if: github.ref == 'refs/heads/rewrite'
+      run: docker build . --file Dockerfile --tag ${DOCKER_REPO}:rewrite-$(date --utc +%Y-%m-%d_%H.%M) --tag ${DOCKER_REPO}:rewrite
+      
+    - name: Build the Docker image
+      if: github.ref == 'refs/heads/master'
+      run: docker build . --file Dockerfile --tag ${DOCKER_REPO}:master-$(date --utc +%Y-%m-%d_%H.%M) --tag ${DOCKER_REPO}:latest
+      
+    - name: Login to registry 
+      run: echo $TOKEN | docker login -u roxedus --password-stdin
+      
+    - name: Pushes the Docker-Image
+      run: docker push ${DOCKER_REPO}

@@ -18,9 +18,14 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+      
     - name: Build the Docker image
-      run: |
-        docker build . --file Dockerfile --tag ${DOCKER_REPO}:$(git rev-parse --abbrev-ref HEAD) --tag ${DOCKER_REPO}:latest
+      if: ${{ github.ref == "rewrite" }}
+      run: docker build . --file Dockerfile --tag ${DOCKER_REPO}:rewrite-$(date --utc +%Y-%m-%d_%H.%M) --tag ${DOCKER_REPO}:rewrite
+      
+    - name: Build the Docker image
+      if: ${{ github.ref == "master" }}
+      run: docker build . --file Dockerfile --tag ${DOCKER_REPO}:master-$(date --utc +%Y-%m-%d_%H.%M) --tag ${DOCKER_REPO}:latest
       
     - name: Login to registry 
       run: echo $TOKEN | docker login -u roxedus --password-stdin
